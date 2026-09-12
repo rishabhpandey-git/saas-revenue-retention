@@ -19,11 +19,11 @@ export with the same schema.)*
    churn, NRR — overall and by segment (`sql/01_mrr_and_churn.sql`).
 3. Compute CAC and an LTV:CAC proxy by acquisition channel.
 4. Track plan-tier upgrade/expansion rates.
-5. Export segment- and channel-level summaries for the Tableau dashboard
-   (`dashboard_segment_summary.csv`, `dashboard_channel_summary.csv`).
+5. Build an interactive dashboard (`dashboard/dashboard.html`) from the
+   segment- and channel-level summaries to visualize the findings.
 
 ## Tech Stack
-MySQL · Tableau
+MySQL · HTML/CSS/JavaScript (Chart.js) for the dashboard
 
 ## Key Findings (computed on the analysis dataset)
 - **Overall logo churn is 33.1%** across 5,000 customers, leaving 3,347
@@ -55,15 +55,23 @@ MySQL · Tableau
    Growth tiers that a dedicated customer-success or upsell campaign could
    capture.
 
+## Dashboard
+An interactive dashboard is included at `dashboard/dashboard.html` —
+download and open it in any browser (no server required) to view the
+segment retention chart, channel efficiency ranking, and recommendations
+in a visual layout.
+
 ## Repo Structure
 ```
 saas-revenue-retention/
 ├── README.md
 ├── summary.md
 ├── subscriptions_raw.csv          <- raw dataset
-├── dashboard_segment_summary.csv  <- Tableau data source
-├── dashboard_channel_summary.csv  <- Tableau data source
-├── dashboard_customer_level.csv   <- Tableau data source (customer-level)
+├── dashboard_segment_summary.csv  <- segment-level summary data
+├── dashboard_channel_summary.csv  <- channel-level summary data
+├── dashboard_customer_level.csv   <- customer-level detail data
+├── dashboard/
+│   └── dashboard.html             <- interactive dashboard
 └── sql/
     └── 01_mrr_and_churn.sql
 ```
