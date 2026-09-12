@@ -1,0 +1,4 @@
+segment,customers,churned,churn_rate_pct,starting_mrr,current_mrr,nrr_pct
+SMB,2781,1143,41.1,408839,305132,74.6
+Mid-Market,1597,427,26.74,246063,226930,92.2
+Enterprise,622,83,13.34,104558,105761,101.2
