@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SaaS Revenue &amp; Cohort Retention — Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#12171B;
+    --panel:#1A2126;
+    --panel-line:#2A3339;
+    --amber:#D9A54A;
+    --teal:#5E9E8A;
+    --brick:#B5574A;
+    --ink:#E8E4DB;
+    --ink-dim:#7C8A91;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:56px 32px 96px;
+  }
+  .masthead{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    border-bottom:1px solid var(--panel-line);
+    padding-bottom:28px;
+    margin-bottom:40px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-optical-sizing:auto;
+    font-weight:500;
+    font-size:clamp(28px,3.4vw,40px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .masthead .meta{
+    color:var(--ink-dim);
+    font-size:14px;
+    text-align:right;
+    max-width:280px;
+  }
+  .kpi-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:0;
+    margin-bottom:56px;
+  }
+  .kpi{
+    padding:0 24px;
+    border-left:1px solid var(--panel-line);
+  }
+  .kpi:first-child{padding-left:0;border-left:none;}
+  .kpi .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:clamp(24px,2.6vw,34px);
+    font-weight:500;
+    color:var(--ink);
+  }
+  .kpi .num.amber{color:var(--amber);}
+  .kpi .num.brick{color:var(--brick);}
+  .kpi .label{
+    color:var(--ink-dim);
+    font-size:13px;
+    margin-top:6px;
+  }
+  section{margin-bottom:64px;}
+  h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:22px;
+    margin:0 0 6px;
+  }
+  .section-note{
+    color:var(--ink-dim);
+    font-size:14.5px;
+    max-width:640px;
+    margin:0 0 24px;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:1.7fr 1fr;
+    gap:40px;
+    align-items:start;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    padding:24px;
+  }
+  .chart-box{position:relative;height:280px;}
+  .chart-box.tall{height:320px;}
+  .rank-list{list-style:none;margin:0;padding:0;}
+  .rank-list li{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:12px 0;
+    border-bottom:1px solid var(--panel-line);
+  }
+  .rank-list li:last-child{border-bottom:none;}
+  .rank-list .ch-name{font-size:14.5px;}
+  .rank-list .ch-name .cac{
+    display:block;
+    color:var(--ink-dim);
+    font-size:12px;
+    margin-top:2px;
+  }
+  .rank-list .ratio{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:16px;
+    font-weight:500;
+  }
+  .ratio.good{color:var(--teal);}
+  .ratio.bad{color:var(--brick);}
+  .findings{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:32px;
+  }
+  .finding{
+    border-top:2px solid var(--amber);
+    padding-top:14px;
+  }
+  .finding.risk{border-top-color:var(--brick);}
+  .finding.pos{border-top-color:var(--teal);}
+  .finding h3{
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    margin:0 0 8px;
+  }
+  .finding p{
+    color:var(--ink-dim);
+    font-size:13.5px;
+    margin:0;
+    line-height:1.55;
+  }
+  footer{
+    border-top:1px solid var(--panel-line);
+    padding-top:24px;
+    color:var(--ink-dim);
+    font-size:13px;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  footer a{color:var(--amber);text-decoration:none;}
+  @media (max-width:760px){
+    .kpi-row{grid-template-columns:1fr 1fr;row-gap:24px;}
+    .kpi{border-left:none;padding-left:0;}
+    .split{grid-template-columns:1fr;}
+    .findings{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <h1>SaaS Revenue &amp; Cohort<br>Retention Analysis</h1>
+    <div class="meta">5,000 customers · 24-month billing window<br>Jan 2023 – Dec 2024</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="num amber">$637,823</div>
+      <div class="label">Current total MRR</div>
+    </div>
+    <div class="kpi">
+      <div class="num">3,347</div>
+      <div class="label">Active accounts</div>
+    </div>
+    <div class="kpi">
+      <div class="num brick">33.1%</div>
+      <div class="label">Logo churn rate</div>
+    </div>
+    <div class="kpi">
+      <div class="num">9.6%</div>
+      <div class="label">Avg. plan upgrade rate</div>
+    </div>
+  </div>
+
+  <section>
+    <h2>Revenue retention by segment</h2>
+    <p class="section-note">Net Revenue Retention (NRR) tells a different story per segment — Enterprise is expanding net of churn, while SMB is losing revenue faster than it replaces it.</p>
+    <div class="split">
+      <div class="panel">
+        <div class="chart-box tall"><canvas id="segmentChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <ul class="rank-list" id="nrrList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Acquisition efficiency by channel</h2>
+    <p class="section-note">LTV:CAC ratio — revenue value per customer relative to acquisition cost. Below 1.0x means the channel currently costs more than it returns.</p>
+    <div class="split">
+      <div class="panel">
+        <div class="chart-box"><canvas id="channelChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <ul class="rank-list" id="channelList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Recommendations</h2>
+    <div class="findings">
+      <div class="finding risk">
+        <h3>Prioritize SMB retention</h3>
+        <p>Largest segment (2,781 customers) but the biggest revenue leak at 74.6% NRR. A modest churn reduction here outweighs gains from the smaller Enterprise base.</p>
+      </div>
+      <div class="finding">
+        <h3>Reallocate acquisition spend</h3>
+        <p>Shift budget from Outbound Sales and Paid Search toward Organic and Referral, which return 4–6x more LTV per dollar of CAC. Outbound may still suit large Enterprise deals specifically.</p>
+      </div>
+      <div class="finding pos">
+        <h3>Build an expansion motion</h3>
+        <p>Upgrade rates sit flat at ~9–10% across tiers — untapped expansion revenue likely exists in Starter and Growth that a dedicated upsell push could capture.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>SaaS Subscription Revenue &amp; Cohort Retention Analysis — Rishabh Pandey</span>
+    <span>Data: MySQL · Chart rendering: Chart.js</span>
+  </footer>
+
+</div>
+
+<script>
+Chart.defaults.color = '#7C8A91';
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.font.size = 12;
+
+const segments = ['SMB','Mid-Market','Enterprise'];
+const segmentMrr = [305132, 226930, 105761];
+const segmentNrr = [74.6, 92.2, 101.2];
+const segmentColors = segmentNrr.map(v => v >= 100 ? '#5E9E8A' : (v >= 90 ? '#D9A54A' : '#B5574A'));
+
+new Chart(document.getElementById('segmentChart'), {
+  type: 'bar',
+  data: {
+    labels: segments,
+    datasets: [{
+      label: 'Current MRR ($)',
+      data: segmentMrr,
+      backgroundColor: segmentColors,
+      borderRadius: 2,
+      barThickness: 64
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#2A3339' }, ticks: { callback: v => '$' + v.toLocaleString() } }
+    }
+  }
+});
+
+const nrrData = [
+  { segment: 'Enterprise', nrr: 101.2, churn: 13.3, cls: 'good' },
+  { segment: 'Mid-Market', nrr: 92.2, churn: 26.7, cls: '' },
+  { segment: 'SMB', nrr: 74.6, churn: 41.1, cls: 'bad' }
+];
+document.getElementById('nrrList').innerHTML = nrrData.map(d => `
+  <li>
+    <span class="ch-name">${d.segment}<span class="cac">${d.churn}% churn</span></span>
+    <span class="ratio ${d.cls}">${d.nrr}% NRR</span>
+  </li>
+`).join('');
+
+const channels = ['Organic','Referral','Partner','Paid Search','Outbound Sales'];
+const ltvCac = [6.21, 4.06, 1.46, 0.94, 0.29];
+const channelColors = ltvCac.map(v => v >= 1 ? '#5E9E8A' : '#B5574A');
+
+new Chart(document.getElementById('channelChart'), {
+  type: 'bar',
+  data: {
+    labels: channels,
+    datasets: [{
+      label: 'LTV:CAC ratio',
+      data: ltvCac,
+      backgroundColor: channelColors,
+      borderRadius: 2
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#2A3339' }, ticks: { callback: v => v + 'x' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+const channelData = [
+  { channel: 'Organic', cac: 60, ratio: 6.21, cls: 'good' },
+  { channel: 'Referral', cac: 90, ratio: 4.06, cls: 'good' },
+  { channel: 'Partner', cac: 299, ratio: 1.46, cls: 'good' },
+  { channel: 'Paid Search', cac: 421, ratio: 0.94, cls: 'bad' },
+  { channel: 'Outbound Sales', cac: 1341, ratio: 0.29, cls: 'bad' }
+];
+document.getElementById('channelList').innerHTML = channelData.map(d => `
+  <li>
+    <span class="ch-name">${d.channel}<span class="cac">$${d.cac} avg CAC</span></span>
+    <span class="ratio ${d.cls}">${d.ratio}x</span>
+  </li>
+`).join('');
+</script>
+</body>
+</html>
