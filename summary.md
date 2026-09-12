@@ -24,5 +24,5 @@ segment and acquisition channel. Visualized in Tableau.
    large Enterprise deals.
 3. Build a dedicated expansion/upsell motion to lift the ~9-10% upgrade rate.
 
-**Dashboard:** [Tableau Public link]
+**Dashboard:** Interactive dashboard included at `dashboard/dashboard.html`
 **Full Analysis:** See `sql/01_mrr_and_churn.sql` in this repo
